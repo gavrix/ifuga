@@ -1,0 +1,7 @@
+//
+// Prefix header for all source files of the 'iFuga' target in the 'iFuga' project
+//
+
+#ifdef __OBJC__
+    #import <Foundation/Foundation.h>
+#endif

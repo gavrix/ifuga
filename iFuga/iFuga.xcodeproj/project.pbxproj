@@ -1,0 +1,246 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		24661CB015B47FCE0060B9AD /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24661CAF15B47FCE0060B9AD /* Foundation.framework */; };
+		24661CB615B47FCE0060B9AD /* FGController.m in Sources */ = {isa = PBXBuildFile; fileRef = 24661CB515B47FCE0060B9AD /* FGController.m */; };
+		24661CC115B482A20060B9AD /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24661CC015B482A20060B9AD /* UIKit.framework */; };
+		24661D0B15B4BA080060B9AD /* FGCenteredScrollView.h in Headers */ = {isa = PBXBuildFile; fileRef = 24661D0915B4BA080060B9AD /* FGCenteredScrollView.h */; };
+		24661D0C15B4BA080060B9AD /* FGCenteredScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 24661D0A15B4BA080060B9AD /* FGCenteredScrollView.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		24661CAC15B47FCE0060B9AD /* libiFuga.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libiFuga.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		24661CAF15B47FCE0060B9AD /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		24661CB315B47FCE0060B9AD /* iFuga-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "iFuga-Prefix.pch"; sourceTree = "<group>"; };
+		24661CB415B47FCE0060B9AD /* FGController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FGController.h; sourceTree = "<group>"; };
+		24661CB515B47FCE0060B9AD /* FGController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FGController.m; sourceTree = "<group>"; };
+		24661CC015B482A20060B9AD /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		24661D0915B4BA080060B9AD /* FGCenteredScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FGCenteredScrollView.h; sourceTree = "<group>"; };
+		24661D0A15B4BA080060B9AD /* FGCenteredScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FGCenteredScrollView.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		24661CA915B47FCE0060B9AD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				24661CC115B482A20060B9AD /* UIKit.framework in Frameworks */,
+				24661CB015B47FCE0060B9AD /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		24661CA115B47FCE0060B9AD = {
+			isa = PBXGroup;
+			children = (
+				24661CB115B47FCE0060B9AD /* iFuga */,
+				24661CAE15B47FCE0060B9AD /* Frameworks */,
+				24661CAD15B47FCE0060B9AD /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		24661CAD15B47FCE0060B9AD /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				24661CAC15B47FCE0060B9AD /* libiFuga.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		24661CAE15B47FCE0060B9AD /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				24661CC015B482A20060B9AD /* UIKit.framework */,
+				24661CAF15B47FCE0060B9AD /* Foundation.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		24661CB115B47FCE0060B9AD /* iFuga */ = {
+			isa = PBXGroup;
+			children = (
+				24661CB415B47FCE0060B9AD /* FGController.h */,
+				24661CB515B47FCE0060B9AD /* FGController.m */,
+				24661CB215B47FCE0060B9AD /* Supporting Files */,
+				24661D0915B4BA080060B9AD /* FGCenteredScrollView.h */,
+				24661D0A15B4BA080060B9AD /* FGCenteredScrollView.m */,
+			);
+			path = iFuga;
+			sourceTree = "<group>";
+		};
+		24661CB215B47FCE0060B9AD /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				24661CB315B47FCE0060B9AD /* iFuga-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		24661CAA15B47FCE0060B9AD /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				24661D0B15B4BA080060B9AD /* FGCenteredScrollView.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		24661CAB15B47FCE0060B9AD /* iFuga */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 24661CB915B47FCE0060B9AD /* Build configuration list for PBXNativeTarget "iFuga" */;
+			buildPhases = (
+				24661CA815B47FCE0060B9AD /* Sources */,
+				24661CA915B47FCE0060B9AD /* Frameworks */,
+				24661CAA15B47FCE0060B9AD /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = iFuga;
+			productName = iFuga;
+			productReference = 24661CAC15B47FCE0060B9AD /* libiFuga.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		24661CA315B47FCE0060B9AD /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				CLASSPREFIX = FG;
+				LastUpgradeCheck = 0430;
+				ORGANIZATIONNAME = "Sergey Gavrilyuk";
+			};
+			buildConfigurationList = 24661CA615B47FCE0060B9AD /* Build configuration list for PBXProject "iFuga" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 24661CA115B47FCE0060B9AD;
+			productRefGroup = 24661CAD15B47FCE0060B9AD /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				24661CAB15B47FCE0060B9AD /* iFuga */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		24661CA815B47FCE0060B9AD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				24661CB615B47FCE0060B9AD /* FGController.m in Sources */,
+				24661D0C15B4BA080060B9AD /* FGCenteredScrollView.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		24661CB715B47FCE0060B9AD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		24661CB815B47FCE0060B9AD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				COPY_PHASE_STRIP = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		24661CBA15B47FCE0060B9AD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DSTROOT = /tmp/iFuga.dst;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "iFuga/iFuga-Prefix.pch";
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		24661CBB15B47FCE0060B9AD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DSTROOT = /tmp/iFuga.dst;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "iFuga/iFuga-Prefix.pch";
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		24661CA615B47FCE0060B9AD /* Build configuration list for PBXProject "iFuga" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				24661CB715B47FCE0060B9AD /* Debug */,
+				24661CB815B47FCE0060B9AD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		24661CB915B47FCE0060B9AD /* Build configuration list for PBXNativeTarget "iFuga" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				24661CBA15B47FCE0060B9AD /* Debug */,
+				24661CBB15B47FCE0060B9AD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 24661CA315B47FCE0060B9AD /* Project object */;
+}
