@@ -19,6 +19,7 @@ static BOOL __isInstanceOfFGControllerShowing;
 -(void) _signUpForNotifications;
 -(void) _releaseNotifications;
 -(CGAffineTransform) transformForUIInterfaceOrientation:(UIInterfaceOrientation) orientation;
+-(UIImage*) imageFromView:(UIView*)view;
 @end
 
 
@@ -52,6 +53,7 @@ static BOOL __isInstanceOfFGControllerShowing;
         _scrollView.delegate = self;
         _scrollView.backgroundColor = [UIColor clearColor];
         _scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
+        
         
         _mainView = [[UIView alloc] initWithFrame:_view.bounds];
         _mainView.backgroundColor = [UIColor clearColor];
@@ -103,6 +105,7 @@ static BOOL __isInstanceOfFGControllerShowing;
     [_backgroundView release];
     [_scrollView release];
     [_mainView release];
+    [_imageView release];
 
     [super dealloc];
 }
@@ -158,6 +161,10 @@ static BOOL __isInstanceOfFGControllerShowing;
     _scrollView.zoomScale = 1;
 
 
+    UIImageView* transitionView = [[[UIImageView alloc] initWithFrame:_thumbView.frame] autorelease];
+    transitionView.image = [self imageFromView:_thumbView];
+    [_scrollView addSubview:transitionView];
+    
     CGRect thumbnailRect = [_thumbView.superview convertRect:_thumbView.frame toView:keyWindow];
     CGRect fromRect = [_scrollView convertRect:thumbnailRect fromView:keyWindow];
     
@@ -187,7 +194,7 @@ static BOOL __isInstanceOfFGControllerShowing;
                                       ceil((_scrollView.bounds.size.height - _imageView.image.size.height)/2.0), 
                                       _imageView.image.size.width,
                                       _imageView.image.size.height);
-
+        [transitionView removeFromSuperview];
         
         CGFloat wscale = 1;
         CGFloat hscale = 1;
@@ -204,6 +211,7 @@ static BOOL __isInstanceOfFGControllerShowing;
     }];
     
     _imageView.layer.anchorPoint = CGPointZero;
+    transitionView.layer.anchorPoint = CGPointZero;
     
     CABasicAnimation* boundsAnimation = [CABasicAnimation animationWithKeyPath:@"bounds"];
     boundsAnimation.fromValue = [NSValue valueWithCGRect:fromRect];
@@ -213,13 +221,23 @@ static BOOL __isInstanceOfFGControllerShowing;
     positionAnimation.fromValue = [NSValue valueWithCGPoint:fromRect.origin];
     positionAnimation.toValue = [NSValue valueWithCGPoint:toRect.origin];
     
-    CABasicAnimation* alphaAnimation = [CABasicAnimation animationWithKeyPath:@"opacity"];
-    alphaAnimation.fromValue = [NSNumber numberWithFloat:0];
-    alphaAnimation.toValue = [NSNumber numberWithFloat:1];
+    CABasicAnimation* fadeInAnimation = [CABasicAnimation animationWithKeyPath:@"opacity"];
+    fadeInAnimation.fromValue = [NSNumber numberWithFloat:0];
+    fadeInAnimation.toValue = [NSNumber numberWithFloat:1];
     
-    [_backgroundView.layer addAnimation:alphaAnimation forKey:nil];
+    CABasicAnimation* fadeOutAnimation = [CABasicAnimation animationWithKeyPath:@"opacity"];
+    fadeOutAnimation.fromValue = [NSNumber numberWithFloat:1];
+    fadeOutAnimation.toValue = [NSNumber numberWithFloat:0];
+    
+    
+    [_backgroundView.layer addAnimation:fadeInAnimation forKey:nil];
     [_imageView.layer addAnimation:boundsAnimation forKey:nil];
     [_imageView.layer addAnimation:positionAnimation forKey:nil];
+    [_imageView.layer addAnimation:fadeInAnimation forKey:nil];
+    
+    [transitionView.layer addAnimation:boundsAnimation forKey:nil];
+    [transitionView.layer addAnimation:positionAnimation forKey:nil];
+    [transitionView.layer addAnimation:fadeOutAnimation forKey:nil];
     
     [CATransaction commit];
     
@@ -242,6 +260,11 @@ static BOOL __isInstanceOfFGControllerShowing;
     
     _imageView.transform = CGAffineTransformIdentity;
     
+    UIImageView* transitionView = [[[UIImageView alloc] initWithFrame:CGRectZero] autorelease];
+    transitionView.layer.anchorPoint = CGPointZero;
+    transitionView.image = [self imageFromView:_thumbView];
+    [_scrollView addSubview:transitionView];
+    
     [CATransaction begin];
     [CATransaction setAnimationDuration:0.66];
     
@@ -249,6 +272,7 @@ static BOOL __isInstanceOfFGControllerShowing;
     _imageView.layer.anchorPoint = CGPointZero;
     [CATransaction setCompletionBlock:^
      {
+         [transitionView removeFromSuperview];
          [_view removeFromSuperview];
          _imageView.layer.anchorPoint = CGPointMake(.5, .5);
          [self _exitShowingExclusively];
@@ -259,24 +283,27 @@ static BOOL __isInstanceOfFGControllerShowing;
     CABasicAnimation* boundsAnimation = [CABasicAnimation animationWithKeyPath:@"bounds"];
     boundsAnimation.fromValue = [NSValue valueWithCGRect:fromRect];
     boundsAnimation.toValue = [NSValue valueWithCGRect:toRect];
-
-    CABasicAnimation* transformAnimation = [CABasicAnimation animationWithKeyPath:@"transform.scale"];
-    transformAnimation.fromValue = [NSNumber numberWithFloat:_scrollView.zoomScale];
-    transformAnimation.toValue = [NSNumber numberWithFloat:1];
-
     
     CABasicAnimation* positionAnimation = [CABasicAnimation animationWithKeyPath:@"position"];
     positionAnimation.fromValue = [NSValue valueWithCGPoint:fromRect.origin];
     positionAnimation.toValue = [NSValue valueWithCGPoint:toRect.origin];
     
-    CABasicAnimation* alphaAnimation = [CABasicAnimation animationWithKeyPath:@"opacity"];
-    alphaAnimation.fromValue = [NSNumber numberWithFloat:1];
-    alphaAnimation.toValue = [NSNumber numberWithFloat:0];
+    CABasicAnimation* fadeOutAnimation = [CABasicAnimation animationWithKeyPath:@"opacity"];
+    fadeOutAnimation.fromValue = [NSNumber numberWithFloat:1];
+    fadeOutAnimation.toValue = [NSNumber numberWithFloat:0];
+
+    CABasicAnimation* fadeInAnimation = [CABasicAnimation animationWithKeyPath:@"opacity"];
+    fadeInAnimation.fromValue = [NSNumber numberWithFloat:0];
+    fadeInAnimation.toValue = [NSNumber numberWithFloat:1];
     
-    [_backgroundView.layer addAnimation:alphaAnimation forKey:nil];
+    [_backgroundView.layer addAnimation:fadeOutAnimation forKey:nil];
     [_imageView.layer addAnimation:boundsAnimation forKey:nil];
     [_imageView.layer addAnimation:positionAnimation forKey:nil];
-//    [_imageView.layer addAnimation:transformAnimation forKey:nil];
+    [_imageView.layer addAnimation:fadeOutAnimation forKey:nil];
+
+    [transitionView.layer addAnimation:boundsAnimation forKey:nil];
+    [transitionView.layer addAnimation:positionAnimation forKey:nil];
+    [transitionView.layer addAnimation:fadeInAnimation forKey:nil];
 
     
     
@@ -427,6 +454,22 @@ static BOOL __isInstanceOfFGControllerShowing;
 
     return CGAffineTransformMakeRotation(angle);
 
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+-(UIImage*) imageFromView:(UIView*)view
+{
+    if(!view)
+        return nil;
+    
+    UIGraphicsBeginImageContextWithOptions(view.frame.size, YES, 0);
+    
+    [view.layer renderInContext:UIGraphicsGetCurrentContext()];
+    
+    UIImage* img = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    return img;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
