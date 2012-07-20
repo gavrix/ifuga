@@ -11,7 +11,8 @@
 
 @protocol FGControllerDelegate <NSObject>
 
-
+@optional
+-(BOOL) canRotateToInterfaceOrientation:(UIInterfaceOrientation) orientation;
 @end
 
 @interface FGController : NSObject<UIScrollViewDelegate, UIGestureRecognizerDelegate>

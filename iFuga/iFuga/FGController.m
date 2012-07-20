@@ -437,6 +437,13 @@ static BOOL __isInstanceOfFGControllerShowing;
 {
     UIInterfaceOrientation newOrientation = 
     (UIInterfaceOrientation)[[[notification userInfo] objectForKey:UIApplicationStatusBarOrientationUserInfoKey] intValue];
+
+    if(self.delegate && [self.delegate respondsToSelector:@selector(canRotateToInterfaceOrientation:)])
+    {
+        if(![self.delegate canRotateToInterfaceOrientation:newOrientation])
+            return;
+    }
+    
     CGAffineTransform transform = [self transformForUIInterfaceOrientation:newOrientation];
 
     [CATransaction begin];
