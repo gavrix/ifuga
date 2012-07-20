@@ -140,10 +140,15 @@ static BOOL __isInstanceOfFGControllerShowing;
     
     [keyWindow addSubview:_view];
     _view.frame = keyWindow.bounds;
+    _mainView.frame = _view.bounds;
     _backgroundView.frame =  _view.bounds;
     
     _backgroundView.alpha = 0;
     
+    _imageView.frame = _scrollView.bounds;
+    _scrollView.zoomScale = 1;
+
+
     CGRect thumbnailRect = [_thumbView.superview convertRect:_thumbView.frame toView:keyWindow];
     CGRect fromRect = [_scrollView convertRect:thumbnailRect fromView:keyWindow];
     
@@ -159,6 +164,8 @@ static BOOL __isInstanceOfFGControllerShowing;
                                ceil((_scrollView.bounds.size.height - _imageView.image.size.height*scale)/2.0), 
                                _imageView.image.size.width*scale,
                                _imageView.image.size.height*scale);
+    
+
     
     [CATransaction begin];
     [CATransaction setAnimationDuration:0.66];
@@ -219,7 +226,7 @@ static BOOL __isInstanceOfFGControllerShowing;
     [self _setControlsVisible:NO animated:NO];
     UIWindow* keyWindow = [UIApplication sharedApplication].keyWindow;
     
-    CGRect fromRect = [_scrollView convertRect:_imageView.frame toView:_mainView];
+    CGRect fromRect = [_scrollView convertRect:_imageView.frame toView:_scrollView];
     
     CGRect thumbnailRect = [_thumbView.superview convertRect:_thumbView.frame toView:keyWindow];
     CGRect toRect = [_scrollView convertRect:thumbnailRect fromView:keyWindow];
