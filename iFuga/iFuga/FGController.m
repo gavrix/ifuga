@@ -116,9 +116,18 @@ static BOOL __isInstanceOfFGControllerShowing;
 
 -(BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer
 {
-    return  !CGRectContainsPoint(_toolbar.frame,
-                                [gestureRecognizer locationInView:_mainView]);
-        
+    if(CGRectContainsPoint(_scrollView.frame,
+                           [gestureRecognizer locationInView:_mainView]))
+    {
+        if(_controlsVisible)
+            return  !CGRectContainsPoint(_toolbar.frame,
+                                         [gestureRecognizer locationInView:_mainView]);
+        else
+            return YES;
+    }
+
+    return NO;
+    
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
