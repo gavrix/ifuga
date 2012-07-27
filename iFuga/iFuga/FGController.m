@@ -143,7 +143,6 @@ static BOOL __isInstanceOfFGControllerShowing;
 
 -(void) _enterFullscreen
 {
-    [[UIApplication sharedApplication] setStatusBarHidden:YES];
     
     UIWindow* keyWindow = [UIApplication sharedApplication].keyWindow;
     
@@ -158,69 +157,64 @@ static BOOL __isInstanceOfFGControllerShowing;
     _backgroundView.alpha = 0;
     
     _imageView.frame = _scrollView.bounds;
-    _scrollView.zoomScale = 1;
 
 
     UIImageView* transitionView = [[[UIImageView alloc] initWithFrame:_thumbView.frame] autorelease];
     transitionView.image = [self imageFromView:_thumbView];
     [_scrollView addSubview:transitionView];
     
-    CGRect thumbnailRect = [_thumbView.superview convertRect:_thumbView.frame toView:keyWindow];
-    CGRect fromRect = [_scrollView convertRect:thumbnailRect fromView:keyWindow];
+    _imageView.frame = CGRectMake(ceil((_scrollView.bounds.size.width - _imageView.image.size.width)/2.0),
+                                  ceil((_scrollView.bounds.size.height - _imageView.image.size.height)/2.0), 
+                                  _imageView.image.size.width,
+                                  _imageView.image.size.height);
+    
     
     CGFloat wscale = 1;
     CGFloat hscale = 1;
+    
     if(_imageView.image.size.width > _scrollView.bounds.size.width)
         wscale = _scrollView.bounds.size.width/_imageView.image.size.width;
     if(_imageView.image.size.height > _scrollView.bounds.size.height)
         hscale = _scrollView.bounds.size.height/_imageView.image.size.height;         
-    CGFloat scale = MIN(wscale, hscale);
+    _scrollView.minimumZoomScale = MIN(wscale, hscale);
+    _scrollView.zoomScale = _scrollView.minimumZoomScale;
     
-    CGRect toRect = CGRectMake(ceil((_scrollView.bounds.size.width - _imageView.image.size.width*scale)/2.0),
-                               ceil((_scrollView.bounds.size.height - _imageView.image.size.height*scale)/2.0), 
-                               _imageView.image.size.width*scale,
-                               _imageView.image.size.height*scale);
-    
+
+    CGPoint thumbnailCenter = [_thumbView.superview convertPoint:_thumbView.center toView:keyWindow];
+    CGPoint fromCenter = [_scrollView convertPoint:thumbnailCenter fromView:keyWindow];
 
     
     [CATransaction begin];
     [CATransaction setAnimationDuration:0.66];
-    
+
     [CATransaction setCompletionBlock:^
     {
-        _imageView.layer.anchorPoint = CGPointMake(.5, .5);
         
-        _imageView.frame = CGRectMake(ceil((_scrollView.bounds.size.width - _imageView.image.size.width)/2.0),
-                                      ceil((_scrollView.bounds.size.height - _imageView.image.size.height)/2.0), 
-                                      _imageView.image.size.width,
-                                      _imageView.image.size.height);
+        transitionView.alpha = 1;
+        _imageView.alpha = 1;
+        [_imageView.layer removeAnimationForKey:@"imageViewAnimations"];
         [transitionView removeFromSuperview];
-        
-        CGFloat wscale = 1;
-        CGFloat hscale = 1;
-        if(_imageView.image.size.width > _scrollView.bounds.size.width)
-            wscale = _scrollView.bounds.size.width/_imageView.image.size.width;
-        if(_imageView.image.size.height > _scrollView.bounds.size.height)
-            hscale = _scrollView.bounds.size.height/_imageView.image.size.height;         
-        _scrollView.minimumZoomScale = MIN(wscale, hscale);
-        _scrollView.zoomScale = _scrollView.minimumZoomScale;
-
         
         [self _setControlsVisible:YES animated:YES];
 
     }];
     
-    _imageView.layer.anchorPoint = CGPointZero;
-    transitionView.layer.anchorPoint = CGPointZero;
-    
-    CABasicAnimation* boundsAnimation = [CABasicAnimation animationWithKeyPath:@"bounds"];
-    boundsAnimation.fromValue = [NSValue valueWithCGRect:fromRect];
-    boundsAnimation.toValue = [NSValue valueWithCGRect:toRect];
-    
+    transitionView.alpha = 0;
+    _imageView.alpha = 0;
+
     CABasicAnimation* positionAnimation = [CABasicAnimation animationWithKeyPath:@"position"];
-    positionAnimation.fromValue = [NSValue valueWithCGPoint:fromRect.origin];
-    positionAnimation.toValue = [NSValue valueWithCGPoint:toRect.origin];
+    positionAnimation.fromValue = [NSValue valueWithCGPoint:fromCenter];
+    positionAnimation.toValue = [NSValue valueWithCGPoint:CGPointMake(_scrollView.bounds.size.width/2.0, _scrollView.bounds.size.height/2.0)];
     
+    CABasicAnimation* imageViewScaleWidthAnimation = [CABasicAnimation animationWithKeyPath:@"transform.scale.x"];
+    imageViewScaleWidthAnimation.fromValue = [NSNumber numberWithFloat:_thumbView.frame.size.width/_imageView.image.size.width];
+    imageViewScaleWidthAnimation.toValue = [NSNumber numberWithFloat:_scrollView.zoomScale];
+
+    CABasicAnimation* imageViewScaleHeightAnimation = [CABasicAnimation animationWithKeyPath:@"transform.scale.y"];
+    imageViewScaleHeightAnimation.fromValue = [NSNumber numberWithFloat:_thumbView.frame.size.height/_imageView.image.size.height];
+    imageViewScaleHeightAnimation.toValue = [NSNumber numberWithFloat:_scrollView.zoomScale];
+
+
     CABasicAnimation* fadeInAnimation = [CABasicAnimation animationWithKeyPath:@"opacity"];
     fadeInAnimation.fromValue = [NSNumber numberWithFloat:0];
     fadeInAnimation.toValue = [NSNumber numberWithFloat:1];
@@ -229,20 +223,50 @@ static BOOL __isInstanceOfFGControllerShowing;
     fadeOutAnimation.fromValue = [NSNumber numberWithFloat:1];
     fadeOutAnimation.toValue = [NSNumber numberWithFloat:0];
     
+
+    CABasicAnimation* thumbViewScaleWidthAnimation = [CABasicAnimation animationWithKeyPath:@"transform.scale.x"];
+    thumbViewScaleWidthAnimation.fromValue = [NSNumber numberWithFloat:1];
+    thumbViewScaleWidthAnimation.toValue = [NSNumber numberWithFloat:
+                                            _imageView.image.size.width/_thumbView.frame.size.width*_scrollView.zoomScale];
+
+    CABasicAnimation* thumbViewScaleHeightAnimation = [CABasicAnimation animationWithKeyPath:@"transform.scale.y"];
+    thumbViewScaleHeightAnimation.fromValue = [NSNumber numberWithFloat:1];
+    thumbViewScaleHeightAnimation.toValue = [NSNumber numberWithFloat:
+                                             _imageView.image.size.height/_thumbView.frame.size.height*_scrollView.zoomScale];
+    
     
     [_backgroundView.layer addAnimation:fadeInAnimation forKey:nil];
-    [_imageView.layer addAnimation:boundsAnimation forKey:nil];
-    [_imageView.layer addAnimation:positionAnimation forKey:nil];
-    [_imageView.layer addAnimation:fadeInAnimation forKey:nil];
     
-    [transitionView.layer addAnimation:boundsAnimation forKey:nil];
-    [transitionView.layer addAnimation:positionAnimation forKey:nil];
-    [transitionView.layer addAnimation:fadeOutAnimation forKey:nil];
     
+    CAAnimationGroup* imageViewAnimationsGroup = [CAAnimationGroup animation];
+    imageViewAnimationsGroup.animations = [NSArray arrayWithObjects:
+                                           positionAnimation, 
+                                           imageViewScaleWidthAnimation, 
+                                           imageViewScaleHeightAnimation,
+                                           fadeInAnimation, nil];
+
+
+    imageViewAnimationsGroup.fillMode = kCAFillModeForwards;
+    imageViewAnimationsGroup.removedOnCompletion = NO;    
+    [_imageView.layer addAnimation:imageViewAnimationsGroup forKey:@"imageViewAnimations"];
+//    
+    CAAnimationGroup* thumbViewAnimationsGroup = [CAAnimationGroup animation];
+    thumbViewAnimationsGroup.animations = [NSArray arrayWithObjects:
+                                           thumbViewScaleWidthAnimation, 
+                                           thumbViewScaleHeightAnimation, 
+                                           fadeOutAnimation,
+                                           positionAnimation, nil];
+
+    thumbViewAnimationsGroup.timingFunction = imageViewAnimationsGroup.timingFunction;    
+    
+    [transitionView.layer addAnimation:thumbViewAnimationsGroup forKey:nil];
     [CATransaction commit];
     
     _backgroundView.alpha = 1;
-    
+    [[UIApplication sharedApplication] setStatusBarHidden:YES
+                                            withAnimation:UIStatusBarAnimationFade];
+
+
     [self _signUpForNotifications];
 }
 
@@ -253,40 +277,44 @@ static BOOL __isInstanceOfFGControllerShowing;
     [self _setControlsVisible:NO animated:NO];
     UIWindow* keyWindow = [UIApplication sharedApplication].keyWindow;
     
-    CGRect fromRect = [_scrollView convertRect:_imageView.frame toView:_scrollView];
     
-    CGRect thumbnailRect = [_thumbView.superview convertRect:_thumbView.frame toView:keyWindow];
-    CGRect toRect = [_scrollView convertRect:thumbnailRect fromView:keyWindow];
+    CGPoint fromPosition = _imageView.center;//[_scrollView convertPoint:_imageView.center toView:_scrollView];
+    CGPoint thumbnailCenter = [_thumbView.superview convertPoint:_thumbView.center toView:keyWindow];
+    CGPoint toPosition = [_scrollView convertPoint:thumbnailCenter fromView:keyWindow];
+    
+    CGFloat scale = _scrollView.zoomScale;//[[_imageView.layer valueForKey:@"transform.scale.x"] floatValue];
     
     _imageView.transform = CGAffineTransformIdentity;
     
-    UIImageView* transitionView = [[[UIImageView alloc] initWithFrame:CGRectZero] autorelease];
-    transitionView.layer.anchorPoint = CGPointZero;
+    UIImageView* transitionView = [[[UIImageView alloc] initWithFrame:_thumbView.frame] autorelease];
     transitionView.image = [self imageFromView:_thumbView];
     [_scrollView addSubview:transitionView];
+    
+    _imageView.alpha = 0;
+    transitionView.alpha = 0;
+    
+    //tricky way to stop any scrolling in place
+    [_scrollView setContentOffset:_scrollView.contentOffset animated:NO];
     
     [CATransaction begin];
     [CATransaction setAnimationDuration:0.66];
     
 
-    _imageView.layer.anchorPoint = CGPointZero;
     [CATransaction setCompletionBlock:^
      {
          [transitionView removeFromSuperview];
          [_view removeFromSuperview];
-         _imageView.layer.anchorPoint = CGPointMake(.5, .5);
+         _imageView.alpha = 1;
+
          [self _exitShowingExclusively];
      }];
 
 
 
-    CABasicAnimation* boundsAnimation = [CABasicAnimation animationWithKeyPath:@"bounds"];
-    boundsAnimation.fromValue = [NSValue valueWithCGRect:fromRect];
-    boundsAnimation.toValue = [NSValue valueWithCGRect:toRect];
     
     CABasicAnimation* positionAnimation = [CABasicAnimation animationWithKeyPath:@"position"];
-    positionAnimation.fromValue = [NSValue valueWithCGPoint:fromRect.origin];
-    positionAnimation.toValue = [NSValue valueWithCGPoint:toRect.origin];
+    positionAnimation.fromValue = [NSValue valueWithCGPoint:fromPosition];
+    positionAnimation.toValue = [NSValue valueWithCGPoint:toPosition];
     
     CABasicAnimation* fadeOutAnimation = [CABasicAnimation animationWithKeyPath:@"opacity"];
     fadeOutAnimation.fromValue = [NSNumber numberWithFloat:1];
@@ -295,22 +323,53 @@ static BOOL __isInstanceOfFGControllerShowing;
     CABasicAnimation* fadeInAnimation = [CABasicAnimation animationWithKeyPath:@"opacity"];
     fadeInAnimation.fromValue = [NSNumber numberWithFloat:0];
     fadeInAnimation.toValue = [NSNumber numberWithFloat:1];
+
+    CABasicAnimation* imageViewScaleWidthAnimation = [CABasicAnimation animationWithKeyPath:@"transform.scale.x"];
+    imageViewScaleWidthAnimation.fromValue = [NSNumber numberWithFloat:scale];
+    imageViewScaleWidthAnimation.toValue = [NSNumber numberWithFloat:_thumbView.frame.size.width/_imageView.image.size.width];
+    
+    CABasicAnimation* imageViewScaleHeightAnimation = [CABasicAnimation animationWithKeyPath:@"transform.scale.y"];
+    imageViewScaleHeightAnimation.fromValue = [NSNumber numberWithFloat:scale];
+    imageViewScaleHeightAnimation.toValue = [NSNumber numberWithFloat:_thumbView.frame.size.height/_imageView.image.size.height];
+
+    CABasicAnimation* transitionViewScaleWidthAnimation = [CABasicAnimation animationWithKeyPath:@"transform.scale.x"];
+    transitionViewScaleWidthAnimation.fromValue = [NSNumber numberWithFloat:_imageView.image.size.width/_thumbView.frame.size.width*scale];
+    transitionViewScaleWidthAnimation.toValue = [NSNumber numberWithFloat:1];
+    
+    CABasicAnimation* transitionViewScaleHeightAnimation = [CABasicAnimation animationWithKeyPath:@"transform.scale.y"];
+    transitionViewScaleHeightAnimation.fromValue = [NSNumber numberWithFloat:_imageView.image.size.height/_thumbView.frame.size.height*scale];
+    transitionViewScaleHeightAnimation.toValue = [NSNumber numberWithFloat:1];
+
     
     [_backgroundView.layer addAnimation:fadeOutAnimation forKey:nil];
-    [_imageView.layer addAnimation:boundsAnimation forKey:nil];
-    [_imageView.layer addAnimation:positionAnimation forKey:nil];
-    [_imageView.layer addAnimation:fadeOutAnimation forKey:nil];
 
-    [transitionView.layer addAnimation:boundsAnimation forKey:nil];
-    [transitionView.layer addAnimation:positionAnimation forKey:nil];
-    [transitionView.layer addAnimation:fadeInAnimation forKey:nil];
+    CAAnimationGroup* imageViewAnimations = [CAAnimationGroup animation];
+    imageViewAnimations.animations = [NSArray arrayWithObjects:
+                                      fadeOutAnimation,
+                                      imageViewScaleWidthAnimation,
+                                      imageViewScaleHeightAnimation,
+                                      positionAnimation,
+                                      nil];
 
+    
+    [_imageView.layer addAnimation:imageViewAnimations forKey:nil];
+
+    CAAnimationGroup* transitionViewAnimations = [CAAnimationGroup animation];
+    transitionViewAnimations.animations = [NSArray arrayWithObjects:
+                                           fadeInAnimation,
+                                           transitionViewScaleHeightAnimation,
+                                           transitionViewScaleWidthAnimation,
+                                           positionAnimation,
+                                           nil];
+    
+    [transitionView.layer addAnimation:transitionViewAnimations forKey:nil];
     
     
     [CATransaction commit];
 
     _backgroundView.alpha = 0;
-    [[UIApplication sharedApplication] setStatusBarHidden:YES];
+    [[UIApplication sharedApplication] setStatusBarHidden:NO
+                                            withAnimation:UIStatusBarAnimationFade];
     
     [self _releaseNotifications];
 }
@@ -398,9 +457,12 @@ static BOOL __isInstanceOfFGControllerShowing;
         if(animated)
         {
             [CATransaction begin];
+
+            _toolbar.alpha = 0;
             [CATransaction setCompletionBlock:^
             {
                 _toolbar.hidden = YES;
+                _toolbar.alpha = 1;
             }];
             CABasicAnimation* opacityAnimation = [CABasicAnimation animationWithKeyPath:@"opacity"];
             opacityAnimation.fromValue = [NSNumber numberWithFloat:1];
