@@ -27,6 +27,7 @@
     UIToolbar* _toolbar;
     
     BOOL _controlsVisible;
+    BOOL _showingFullscreen;
 }
 
 
@@ -40,9 +41,11 @@
     fromThumbnail:(UIView*) thumbnailView;
 
 -(void) dismiss;
+
 -(void) dismissAnimated:(BOOL) animated
                finished:(void (^)(void)) finishBloclk;
 
 
 @property (nonatomic, assign) id<FGControllerDelegate> delegate;
+@property (nonatomic, readonly) BOOL showingFullscreen;
 @end

@@ -18,14 +18,18 @@ static BOOL __isInstanceOfFGControllerShowing;
 @interface FGController ()
 -(void) _signUpForNotifications;
 -(void) _releaseNotifications;
+-(UIView*) _transitionView;
 -(CGAffineTransform) transformForUIInterfaceOrientation:(UIInterfaceOrientation) orientation;
 -(UIImage*) imageFromView:(UIView*)view;
+-(UIImage*) scaledImage:(UIImage*) image  toSize:(CGSize) size;
+
 @end
 
 
 
 @implementation FGController
 @synthesize delegate;
+@synthesize showingFullscreen = _showingFullscreen;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma mark Construction && destruction
@@ -134,10 +138,6 @@ static BOOL __isInstanceOfFGControllerShowing;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-#pragma mark Internal utility methods
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma mark Fullscreen
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -156,11 +156,13 @@ static BOOL __isInstanceOfFGControllerShowing;
     
     _backgroundView.alpha = 0;
     
+    
+    _scrollView.contentOffset = CGPointZero;
     _imageView.frame = _scrollView.bounds;
 
 
-    UIImageView* transitionView = [[[UIImageView alloc] initWithFrame:_thumbView.frame] autorelease];
-    transitionView.image = [self imageFromView:_thumbView];
+    UIView* transitionView = [self _transitionView];
+
     [_scrollView addSubview:transitionView];
     
     _imageView.frame = CGRectMake(ceil((_scrollView.bounds.size.width - _imageView.image.size.width)/2.0),
@@ -179,9 +181,7 @@ static BOOL __isInstanceOfFGControllerShowing;
     _scrollView.minimumZoomScale = MIN(wscale, hscale);
     _scrollView.zoomScale = _scrollView.minimumZoomScale;
     
-
-    CGPoint thumbnailCenter = [_thumbView.superview convertPoint:_thumbView.center toView:keyWindow];
-    CGPoint fromCenter = [_scrollView convertPoint:thumbnailCenter fromView:keyWindow];
+    CGPoint fromCenter = transitionView.center;
 
     
     [CATransaction begin];
@@ -207,11 +207,11 @@ static BOOL __isInstanceOfFGControllerShowing;
     positionAnimation.toValue = [NSValue valueWithCGPoint:CGPointMake(_scrollView.bounds.size.width/2.0, _scrollView.bounds.size.height/2.0)];
     
     CABasicAnimation* imageViewScaleWidthAnimation = [CABasicAnimation animationWithKeyPath:@"transform.scale.x"];
-    imageViewScaleWidthAnimation.fromValue = [NSNumber numberWithFloat:_thumbView.frame.size.width/_imageView.image.size.width];
+    imageViewScaleWidthAnimation.fromValue = [NSNumber numberWithFloat:transitionView.frame.size.width/_imageView.image.size.width];
     imageViewScaleWidthAnimation.toValue = [NSNumber numberWithFloat:_scrollView.zoomScale];
 
     CABasicAnimation* imageViewScaleHeightAnimation = [CABasicAnimation animationWithKeyPath:@"transform.scale.y"];
-    imageViewScaleHeightAnimation.fromValue = [NSNumber numberWithFloat:_thumbView.frame.size.height/_imageView.image.size.height];
+    imageViewScaleHeightAnimation.fromValue = [NSNumber numberWithFloat:transitionView.frame.size.height/_imageView.image.size.height];
     imageViewScaleHeightAnimation.toValue = [NSNumber numberWithFloat:_scrollView.zoomScale];
 
 
@@ -227,12 +227,12 @@ static BOOL __isInstanceOfFGControllerShowing;
     CABasicAnimation* thumbViewScaleWidthAnimation = [CABasicAnimation animationWithKeyPath:@"transform.scale.x"];
     thumbViewScaleWidthAnimation.fromValue = [NSNumber numberWithFloat:1];
     thumbViewScaleWidthAnimation.toValue = [NSNumber numberWithFloat:
-                                            _imageView.image.size.width/_thumbView.frame.size.width*_scrollView.zoomScale];
+                                            _imageView.image.size.width/transitionView.frame.size.width*_scrollView.zoomScale];
 
     CABasicAnimation* thumbViewScaleHeightAnimation = [CABasicAnimation animationWithKeyPath:@"transform.scale.y"];
     thumbViewScaleHeightAnimation.fromValue = [NSNumber numberWithFloat:1];
     thumbViewScaleHeightAnimation.toValue = [NSNumber numberWithFloat:
-                                             _imageView.image.size.height/_thumbView.frame.size.height*_scrollView.zoomScale];
+                                             _imageView.image.size.height/transitionView.frame.size.height*_scrollView.zoomScale];
     
     
     [_backgroundView.layer addAnimation:fadeInAnimation forKey:nil];
@@ -271,23 +271,24 @@ static BOOL __isInstanceOfFGControllerShowing;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
--(void) _exitFullscreen
+-(void) _exitFullscreenWithFinishBlock:(void (^)(void)) finishBlock;
 {
     
     [self _setControlsVisible:NO animated:NO];
-    UIWindow* keyWindow = [UIApplication sharedApplication].keyWindow;
+//    UIWindow* keyWindow = [UIApplication sharedApplication].keyWindow;
+    
     
     
     CGPoint fromPosition = _imageView.center;//[_scrollView convertPoint:_imageView.center toView:_scrollView];
-    CGPoint thumbnailCenter = [_thumbView.superview convertPoint:_thumbView.center toView:keyWindow];
-    CGPoint toPosition = [_scrollView convertPoint:thumbnailCenter fromView:keyWindow];
+//    CGPoint thumbnailCenter = [_thumbView.superview convertPoint:_thumbView.center toView:keyWindow];
+//    CGPoint toPosition = [_scrollView convertPoint:thumbnailCenter fromView:keyWindow];
     
     CGFloat scale = _scrollView.zoomScale;//[[_imageView.layer valueForKey:@"transform.scale.x"] floatValue];
     
     _imageView.transform = CGAffineTransformIdentity;
     
-    UIImageView* transitionView = [[[UIImageView alloc] initWithFrame:_thumbView.frame] autorelease];
-    transitionView.image = [self imageFromView:_thumbView];
+    UIView* transitionView = [self _transitionView];
+    
     [_scrollView addSubview:transitionView];
     
     _imageView.alpha = 0;
@@ -305,8 +306,11 @@ static BOOL __isInstanceOfFGControllerShowing;
          [transitionView removeFromSuperview];
          [_view removeFromSuperview];
          _imageView.alpha = 1;
-
+         
          [self _exitShowingExclusively];
+         
+         if(finishBlock)
+             finishBlock();
      }];
 
 
@@ -314,7 +318,7 @@ static BOOL __isInstanceOfFGControllerShowing;
     
     CABasicAnimation* positionAnimation = [CABasicAnimation animationWithKeyPath:@"position"];
     positionAnimation.fromValue = [NSValue valueWithCGPoint:fromPosition];
-    positionAnimation.toValue = [NSValue valueWithCGPoint:toPosition];
+    positionAnimation.toValue = [NSValue valueWithCGPoint:transitionView.center];
     
     CABasicAnimation* fadeOutAnimation = [CABasicAnimation animationWithKeyPath:@"opacity"];
     fadeOutAnimation.fromValue = [NSNumber numberWithFloat:1];
@@ -326,18 +330,18 @@ static BOOL __isInstanceOfFGControllerShowing;
 
     CABasicAnimation* imageViewScaleWidthAnimation = [CABasicAnimation animationWithKeyPath:@"transform.scale.x"];
     imageViewScaleWidthAnimation.fromValue = [NSNumber numberWithFloat:scale];
-    imageViewScaleWidthAnimation.toValue = [NSNumber numberWithFloat:_thumbView.frame.size.width/_imageView.image.size.width];
+    imageViewScaleWidthAnimation.toValue = [NSNumber numberWithFloat:transitionView.frame.size.width/_imageView.image.size.width];
     
     CABasicAnimation* imageViewScaleHeightAnimation = [CABasicAnimation animationWithKeyPath:@"transform.scale.y"];
     imageViewScaleHeightAnimation.fromValue = [NSNumber numberWithFloat:scale];
-    imageViewScaleHeightAnimation.toValue = [NSNumber numberWithFloat:_thumbView.frame.size.height/_imageView.image.size.height];
+    imageViewScaleHeightAnimation.toValue = [NSNumber numberWithFloat:transitionView.frame.size.height/_imageView.image.size.height];
 
     CABasicAnimation* transitionViewScaleWidthAnimation = [CABasicAnimation animationWithKeyPath:@"transform.scale.x"];
-    transitionViewScaleWidthAnimation.fromValue = [NSNumber numberWithFloat:_imageView.image.size.width/_thumbView.frame.size.width*scale];
+    transitionViewScaleWidthAnimation.fromValue = [NSNumber numberWithFloat:_imageView.image.size.width/transitionView.frame.size.width*scale];
     transitionViewScaleWidthAnimation.toValue = [NSNumber numberWithFloat:1];
     
     CABasicAnimation* transitionViewScaleHeightAnimation = [CABasicAnimation animationWithKeyPath:@"transform.scale.y"];
-    transitionViewScaleHeightAnimation.fromValue = [NSNumber numberWithFloat:_imageView.image.size.height/_thumbView.frame.size.height*scale];
+    transitionViewScaleHeightAnimation.fromValue = [NSNumber numberWithFloat:_imageView.image.size.height/transitionView.frame.size.height*scale];
     transitionViewScaleHeightAnimation.toValue = [NSNumber numberWithFloat:1];
 
     
@@ -393,13 +397,17 @@ static BOOL __isInstanceOfFGControllerShowing;
                               userInfo:nil] raise];
     }
     else
+    {
         __isInstanceOfFGControllerShowing = YES;
+        _showingFullscreen = YES;
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 -(void) _exitShowingExclusively
 {
     __isInstanceOfFGControllerShowing = NO;
+    _showingFullscreen = NO;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -535,7 +543,47 @@ static BOOL __isInstanceOfFGControllerShowing;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+-(UIImage*) scaledImage:(UIImage*) image 
+                 toSize:(CGSize) size
+{
+    UIGraphicsBeginImageContextWithOptions(size, YES, 0);
+    [image drawInRect:CGRectMake(0,0,size.width,size.height)];
+    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return newImage;
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+-(UIView*) _transitionView
+{
+    UIWindow* keyWindow = [UIApplication sharedApplication].keyWindow;
+    
+    UIImageView* transitionView = [[[UIImageView alloc] initWithFrame:CGRectZero] autorelease];
+    if(_thumbView)
+    {
+        transitionView.frame = _thumbView.frame;
+        transitionView.image = [self imageFromView:_thumbView];
+        CGPoint thumbnailCenter = [_thumbView.superview convertPoint:_thumbView.center toView:keyWindow];
+        transitionView.center = [_scrollView convertPoint:thumbnailCenter fromView:keyWindow];
+    }
+    else
+    {
+        CGSize size = CGSizeMake(_scrollView.frame.size.width/3, _scrollView.frame.size.height/3);
+        CGFloat ws = size.width/_imageView.image.size.width;
+        CGFloat hs = size.height/_imageView.image.size.height;
+        CGFloat s = MIN(ws,hs);
+        transitionView.frame = CGRectMake(0, 0, _imageView.image.size.width*s, _imageView.image.size.height*s);
+        transitionView.image = [self scaledImage:_imageView.image toSize:transitionView.bounds.size];
+        transitionView.center = [_scrollView convertPoint:CGPointMake(_scrollView.bounds.size.width/2.0,
+                                                                      _scrollView.bounds.size.height/2.0)
+                                                 fromView:_scrollView.superview];
+        transitionView.hidden = YES;
+    }
+    
+    return transitionView;
+
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma mark- Notification listeners
@@ -632,8 +680,11 @@ static BOOL __isInstanceOfFGControllerShowing;
 -(void) showImage:(UIImage*) image
 {
     [self _tryShowingExclusivlely];
+    [_thumbView release]; _thumbView = nil;
     
-
+    _imageView.image = image;
+    
+    [self _enterFullscreen];
     
 }
 
@@ -659,7 +710,7 @@ static BOOL __isInstanceOfFGControllerShowing;
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 -(void)dismissAnimated:(BOOL)animated finished:(void (^)(void))finishBloclk
 {
-    [self _exitFullscreen];
+    [self _exitFullscreenWithFinishBlock:finishBloclk];
 }
 
 
