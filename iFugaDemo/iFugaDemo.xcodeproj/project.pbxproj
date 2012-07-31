@@ -15,9 +15,9 @@
 		24661CE215B4AEF00060B9AD /* FGAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 24661CE115B4AEF00060B9AD /* FGAppDelegate.m */; };
 		24661CE515B4AEF00060B9AD /* FGViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 24661CE415B4AEF00060B9AD /* FGViewController.m */; };
 		24661CE815B4AEF00060B9AD /* FGViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 24661CE615B4AEF00060B9AD /* FGViewController.xib */; };
-		24661D0515B4AFC90060B9AD /* Default-Portrait.png in Resources */ = {isa = PBXBuildFile; fileRef = 24661D0415B4AFC90060B9AD /* Default-Portrait.png */; };
 		24661D0615B4B0C20060B9AD /* libiFuga.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 24661CF715B4AF060060B9AD /* libiFuga.a */; };
 		24661D0815B4B68E0060B9AD /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24661D0715B4B68E0060B9AD /* QuartzCore.framework */; };
+		24FFC1CA15C82C2F00CCC800 /* 11278-bluemarblewest.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 24FFC1C915C82C2F00CCC800 /* 11278-bluemarblewest.jpg */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -46,8 +46,8 @@
 		24661CE715B4AEF00060B9AD /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/FGViewController.xib; sourceTree = "<group>"; };
 		24661CF215B4AF060060B9AD /* iFuga.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = iFuga.xcodeproj; path = ../iFuga/iFuga.xcodeproj; sourceTree = "<group>"; };
 		24661D0315B4AF530060B9AD /* FGController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = FGController.h; path = ../../iFuga/iFuga/FGController.h; sourceTree = "<group>"; };
-		24661D0415B4AFC90060B9AD /* Default-Portrait.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-Portrait.png"; sourceTree = "<group>"; };
 		24661D0715B4B68E0060B9AD /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		24FFC1C915C82C2F00CCC800 /* 11278-bluemarblewest.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "11278-bluemarblewest.jpg"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -104,7 +104,7 @@
 				24661CE315B4AEF00060B9AD /* FGViewController.h */,
 				24661CE415B4AEF00060B9AD /* FGViewController.m */,
 				24661CE615B4AEF00060B9AD /* FGViewController.xib */,
-				24661D0415B4AFC90060B9AD /* Default-Portrait.png */,
+				24FFC1C915C82C2F00CCC800 /* 11278-bluemarblewest.jpg */,
 				24661CD815B4AEF00060B9AD /* Supporting Files */,
 			);
 			path = iFugaDemo;
@@ -198,7 +198,7 @@
 			files = (
 				24661CDC15B4AEF00060B9AD /* InfoPlist.strings in Resources */,
 				24661CE815B4AEF00060B9AD /* FGViewController.xib in Resources */,
-				24661D0515B4AFC90060B9AD /* Default-Portrait.png in Resources */,
+				24FFC1CA15C82C2F00CCC800 /* 11278-bluemarblewest.jpg in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
