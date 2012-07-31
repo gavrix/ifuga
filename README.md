@@ -33,6 +33,6 @@ iFuga was created by [@gavrix](http://twitter.com/gavrix).<br/>
 Also, please drop by my [blog](http://gavrix.wordpress.com)
 
 ## License
-iFuga is available under the MIT license.
+iFuga is available under the MIT license. See LICENSE for more info.
 
 
