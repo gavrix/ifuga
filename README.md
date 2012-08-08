@@ -4,6 +4,13 @@
 iOS component for displaying a fullscreen image gallery
 Supports orientation changes
 
+## Installation
+iFuga is available via cocoapods. If you're not familiar with it, see [here](https://github.com/CocoaPods/CocoaPods).
+Once you have cocoapods installed and ready, add to your project's `Podfile` following line
+``` ruby
+pod 'iFuga', '~>1.1'
+```
+For more options in Podfile, please see official [documentation](https://github.com/CocoaPods/CocoaPods/wiki/A-Podfile).
 
 ## Usage
 To be able to show a fullscreen presentation of image from inside your viewController you 
